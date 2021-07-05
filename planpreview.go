@@ -65,7 +65,7 @@ type ApplicationInfo struct {
 	ApplicationDirectory string
 }
 
-func getPlanPreview(
+func retrievePlanPreview(
 	ctx context.Context,
 	remoteURL,
 	baseBranch,
@@ -76,7 +76,7 @@ func getPlanPreview(
 	timeout time.Duration,
 ) (*PlanPreviewResult, error) {
 
-	dir, err := ioutil.TempDir("plan-preview", "")
+	dir, err := ioutil.TempDir("", "")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a temporary directory (%w)", err)
 	}
@@ -106,7 +106,7 @@ func getPlanPreview(
 	}
 
 	var r PlanPreviewResult
-	if err := json.Unmarshal(out, data); err != nil {
+	if err := json.Unmarshal(data, &r); err != nil {
 		return nil, fmt.Errorf("failed to parse result file (%w)", err)
 	}
 

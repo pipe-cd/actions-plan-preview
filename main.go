@@ -30,20 +30,24 @@ const (
 )
 
 func main() {
+	log.Println("Start running plan-preview")
+
 	args, err := parseArgs(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Successfully parsed arguments")
 
 	event, err := parseGitHubEvent()
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Successfully parsed GitHub event")
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	result, err := getPlanPreview(
+	result, err := retrievePlanPreview(
 		ctx,
 		event.RepoRemote,
 		event.BaseBranch,
@@ -56,9 +60,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Successfully retrived plan-preview result")
 
 	body := makeCommentBody(result)
-
 	comment, err := sendComment(ctx, args.Token, event.PRNumber, body)
 	if err != nil {
 		log.Fatal(err)
