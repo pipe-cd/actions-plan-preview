@@ -24,7 +24,7 @@ runs:
     - address=${{ inputs.address }}
     - api-key=${{ inputs.api-key }}
     - token=${{ inputs.token }}
-    - timeout=${{ input.timeout }}
+    - timeout=${{ inputs.timeout }}
 
 branding:
   icon: 'eye'
