@@ -83,6 +83,7 @@ func retrievePlanPreview(
 	outPath := filepath.Join(dir, "result.json")
 
 	args := []string{
+		"plan-preview",
 		"--repo-remote-url", remoteURL,
 		"--base-branch", baseBranch,
 		"--head-branch", headBranch,
