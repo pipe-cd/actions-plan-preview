@@ -1,2 +1,3 @@
 # actions-plan-preview
-[WIP] An action that leaves PipeCD's PlanPreview result on GitHub pull request.
+
+An action that comments PipeCD's PlanPreview result on GitHub pull request.

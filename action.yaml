@@ -1,0 +1,25 @@
+name: 'PipeCD Plan Preview'
+description: 'Comment PipeCD's PlanPreview result on GitHub pull request'
+author: 'PipeCD team'
+
+inputs:
+  address:
+    description: 'The address of PipeCD's control-plane.'
+    required: true
+  api_key:
+    description: 'The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane.'
+    required: true
+  token:
+    description: 'The GITHUB_TOKEN secret used to send comment on pull request.'
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.token }}
+    - ${{ inputs.address }}
+
+branding:
+  icon: 'eye'
+  color: 'green'
