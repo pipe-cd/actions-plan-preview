@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/google/go-github/v36/github"
-	"golang.org/x/oauth2"
 )
 
 type githubEvent struct {
@@ -32,8 +31,9 @@ type githubEvent struct {
 	HeadBranch  string
 	HeadCommit  string
 	BaseBranch  string
-	IsComment   bool
 	SenderLogin string
+	IsComment   bool
+	CommentURL  string
 }
 
 // parsePullRequestEvent uses the given environment variables
@@ -43,7 +43,7 @@ type githubEvent struct {
 //   https://pkg.go.dev/github.com/google/go-github/v36/github#PullRequestEvent
 // - IssueCommentEvent
 //   https://pkg.go.dev/github.com/google/go-github/v36/github#IssueCommentEvent
-func parseGitHubEvent() (*githubEvent, error) {
+func parseGitHubEvent(ctx context.Context, client *github.Client) (*githubEvent, error) {
 	const (
 		pullRequestEventName = "pull_request"
 		commentEventName     = "issue_comment"
@@ -68,26 +68,38 @@ func parseGitHubEvent() (*githubEvent, error) {
 	switch e := event.(type) {
 	case *github.PullRequestEvent:
 		return &githubEvent{
-			Owner:      e.Repo.Owner.GetName(),
-			Repo:       e.Repo.GetName(),
-			RepoRemote: e.Repo.GetSSHURL(),
-			PRNumber:   e.GetNumber(),
-			HeadBranch: e.PullRequest.Head.GetRef(),
-			HeadCommit: e.PullRequest.Head.GetSHA(),
-			BaseBranch: e.PullRequest.Base.GetRef(),
+			Owner:       e.Repo.Owner.GetName(),
+			Repo:        e.Repo.GetName(),
+			RepoRemote:  e.Repo.GetSSHURL(),
+			PRNumber:    e.GetNumber(),
+			HeadBranch:  e.PullRequest.Head.GetRef(),
+			HeadCommit:  e.PullRequest.Head.GetSHA(),
+			BaseBranch:  e.PullRequest.Base.GetRef(),
+			SenderLogin: e.Sender.GetName(),
 		}, nil
 
 	case *github.IssueCommentEvent:
+		var (
+			owner = e.Repo.Owner.GetName()
+			repo  = e.Repo.GetName()
+			prNum = e.Issue.GetNumber()
+		)
+		pr, err := getPullRequest(ctx, client, owner, repo, prNum)
+		if err != nil {
+			return nil, err
+		}
+
 		return &githubEvent{
-			Owner:      e.Repo.Owner.GetName(),
-			Repo:       e.Repo.GetName(),
-			RepoRemote: e.Repo.GetSSHURL(),
-			PRNumber:   e.Issue.GetNumber(),
-			//HeadBranch:  e.Issue.Head.GetRef(),
-			//HeadCommit:  e.PullRequest.Head.GetSHA(),
-			//BaseBranch:  e.PullRequest.Base.GetRef(),
-			IsComment:   true,
+			Owner:       owner,
+			Repo:        repo,
+			RepoRemote:  e.Repo.GetSSHURL(),
+			PRNumber:    prNum,
+			HeadBranch:  pr.Head.GetRef(),
+			HeadCommit:  pr.Head.GetSHA(),
+			BaseBranch:  pr.Base.GetRef(),
 			SenderLogin: e.Sender.GetName(),
+			IsComment:   true,
+			CommentURL:  e.Comment.GetHTMLURL(),
 		}, nil
 
 	default:
@@ -95,16 +107,14 @@ func parseGitHubEvent() (*githubEvent, error) {
 	}
 }
 
-func sendComment(ctx context.Context, token string, pr int, body string) (*github.IssueComment, error) {
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	client := github.NewClient(tc)
-	// https://pkg.go.dev/github.com/google/go-github/v36/github#IssueComment
-	c, _, err := client.Issues.CreateComment(ctx, "owner", "repo", pr, &github.IssueComment{
+func sendComment(ctx context.Context, client *github.Client, owner, repo string, prNum int, body string) (*github.IssueComment, error) {
+	c, _, err := client.Issues.CreateComment(ctx, owner, repo, prNum, &github.IssueComment{
 		Body: &body,
 	})
 	return c, err
+}
+
+func getPullRequest(ctx context.Context, client *github.Client, owner, repo string, prNum int) (*github.PullRequest, error) {
+	pr, _, err := client.PullRequests.Get(ctx, owner, repo, prNum)
+	return pr, err
 }

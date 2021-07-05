@@ -23,6 +23,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/google/go-github/v36/github"
+	"golang.org/x/oauth2"
 )
 
 const (
@@ -38,14 +41,20 @@ func main() {
 	}
 	log.Println("Successfully parsed arguments")
 
-	event, err := parseGitHubEvent()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: args.Token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	ghClient := github.NewClient(tc)
+
+	event, err := parseGitHubEvent(ctx, ghClient)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("Successfully parsed GitHub event")
-
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
 
 	result, err := retrievePlanPreview(
 		ctx,
@@ -60,10 +69,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Successfully retrived plan-preview result")
+	log.Println("Successfully retrieved plan-preview result")
 
-	body := makeCommentBody(result)
-	comment, err := sendComment(ctx, args.Token, event.PRNumber, body)
+	body := makeCommentBody(event, result)
+	comment, err := sendComment(
+		ctx,
+		ghClient,
+		event.Owner,
+		event.Repo,
+		event.PRNumber,
+		body,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,10 +134,10 @@ func parseArgs(args []string) (arguments, error) {
 	return out, nil
 }
 
-func makeCommentBody(r *PlanPreviewResult) string {
+func makeCommentBody(event *githubEvent, result *PlanPreviewResult) string {
 	var b strings.Builder
-	b.WriteString("RESPONSE")
-	b.WriteString(fmt.Sprintf("%v\n", r))
+	b.WriteString(fmt.Sprintf("@%s Here are plan-preview result for commit %s\n", event.SenderLogin, event.HeadCommit))
+	b.WriteString(fmt.Sprintf("%v\n", result))
 
 	return b.String()
 }
