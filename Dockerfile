@@ -6,4 +6,5 @@ RUN go build -o /plan-preview .
 FROM gcr.io/pipecd/pipectl:v0.10.2
 COPY --from=builder /plan-preview ./
 RUN chmod +x ./plan-preview
+ENV PATH=$PATH:/app/cmd/pipectl
 ENTRYPOINT ["./plan-preview"]

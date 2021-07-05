@@ -6,19 +6,25 @@ inputs:
   address:
     description: 'The address of PipeCD's control-plane.'
     required: true
-  api_key:
+  api-key:
     description: 'The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane.'
     required: true
   token:
     description: 'The GITHUB_TOKEN secret used to send comment on pull request.'
     required: true
+  timeout:
+    description: 'Maximum amount of time to run. Default is 5m.'
+    required: false
+    default: 5m
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.token }}
-    - ${{ inputs.address }}
+    - address=${{ inputs.address }}
+    - api-key=${{ inputs.api-key }}
+    - token=${{ inputs.token }}
+    - timeout=${{ input.timeout }}
 
 branding:
   icon: 'eye'
