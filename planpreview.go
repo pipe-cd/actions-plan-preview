@@ -95,9 +95,10 @@ func retrievePlanPreview(
 	cmd := exec.CommandContext(ctx, "pipectl", args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to execute pipectl command (%w) (%s)", err, string(out))
 	}
 
+	log.Println("Plan-preview result:")
 	log.Println(string(out))
 
 	data, err := ioutil.ReadFile(outPath)
