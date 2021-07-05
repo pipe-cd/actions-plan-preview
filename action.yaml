@@ -1,13 +1,13 @@
 name: 'PipeCD Plan Preview'
-description: 'Comment PipeCD's PlanPreview result on GitHub pull request'
+description: 'Comment PipeCD PlanPreview result on GitHub pull request'
 author: 'PipeCD team'
 
 inputs:
   address:
-    description: 'The address of PipeCD's control-plane.'
+    description: 'The address of PipeCD control-plane.'
     required: true
   api-key:
-    description: 'The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane.'
+    description: 'The API key with READ_WRITE role used by pipectl while communicating with PipeCD control-plane.'
     required: true
   token:
     description: 'The GITHUB_TOKEN secret used to send comment on pull request.'
