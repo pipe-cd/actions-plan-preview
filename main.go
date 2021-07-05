@@ -55,6 +55,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("Successfully parsed GitHub event")
+	log.Println(event)
 
 	result, err := retrievePlanPreview(
 		ctx,
@@ -132,12 +133,4 @@ func parseArgs(args []string) (arguments, error) {
 	}
 
 	return out, nil
-}
-
-func makeCommentBody(event *githubEvent, result *PlanPreviewResult) string {
-	var b strings.Builder
-	b.WriteString(fmt.Sprintf("@%s Here are plan-preview result for commit %s\n", event.SenderLogin, event.HeadCommit))
-	b.WriteString(fmt.Sprintf("%v\n", result))
-
-	return b.String()
 }

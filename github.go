@@ -75,7 +75,7 @@ func parseGitHubEvent(ctx context.Context, client *github.Client) (*githubEvent,
 			HeadBranch:  e.PullRequest.Head.GetRef(),
 			HeadCommit:  e.PullRequest.Head.GetSHA(),
 			BaseBranch:  e.PullRequest.Base.GetRef(),
-			SenderLogin: e.Sender.GetName(),
+			SenderLogin: e.Sender.GetLogin(),
 		}, nil
 
 	case *github.IssueCommentEvent:
@@ -97,7 +97,7 @@ func parseGitHubEvent(ctx context.Context, client *github.Client) (*githubEvent,
 			HeadBranch:  pr.Head.GetRef(),
 			HeadCommit:  pr.Head.GetSHA(),
 			BaseBranch:  pr.Base.GetRef(),
-			SenderLogin: e.Sender.GetName(),
+			SenderLogin: e.Sender.GetLogin(),
 			IsComment:   true,
 			CommentURL:  e.Comment.GetHTMLURL(),
 		}, nil
