@@ -1,6 +1,6 @@
 FROM golang:1.16.5-alpine3.14
 
-ARG PIPECTL_VERSION=v0.10.2
+ARG PIPECTL_VERSION=v0.10.3
 ARG PIPECTL_URL=https://github.com/pipe-cd/pipe/releases/download/${PIPECTL_VERSION}/pipectl_${PIPECTL_VERSION}_linux_amd64
 
 RUN apk update && apk add curl && \
