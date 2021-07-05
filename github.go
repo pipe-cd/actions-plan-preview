@@ -68,7 +68,7 @@ func parseGitHubEvent(ctx context.Context, client *github.Client) (*githubEvent,
 	switch e := event.(type) {
 	case *github.PullRequestEvent:
 		return &githubEvent{
-			Owner:       e.Repo.Owner.GetName(),
+			Owner:       e.Repo.Owner.GetLogin(),
 			Repo:        e.Repo.GetName(),
 			RepoRemote:  e.Repo.GetSSHURL(),
 			PRNumber:    e.GetNumber(),
@@ -80,7 +80,7 @@ func parseGitHubEvent(ctx context.Context, client *github.Client) (*githubEvent,
 
 	case *github.IssueCommentEvent:
 		var (
-			owner = e.Repo.Owner.GetName()
+			owner = e.Repo.Owner.GetLogin()
 			repo  = e.Repo.GetName()
 			prNum = e.Issue.GetNumber()
 		)

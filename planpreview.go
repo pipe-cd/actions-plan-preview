@@ -99,7 +99,6 @@ func retrievePlanPreview(
 		return nil, fmt.Errorf("failed to execute pipectl command (%w) (%s)", err, string(out))
 	}
 
-	log.Println("Plan-preview result:")
 	log.Println(string(out))
 
 	data, err := ioutil.ReadFile(outPath)
