@@ -2,11 +2,17 @@
 
 An action that comments PipeCD's PlanPreview result on GitHub pull request.
 
+See https://pipecd.dev/docs/user-guide/plan-preview/ for more details about this feature.
+
 ![](/assets/plan-preview-comment.png)
 
 ## Usage
 
-Adding a new workflow (eg: `.github/workflows/plan-preview.yaml`) with the content as below:
+By adding the following workflow to your `.github` directory (eg: `.github/workflows/plan-preview.yaml`) you will have:
+
+- The result of plan-preview will be automatically commented on pull request when it is opened or updated 
+- You can leave a `/pipecd plan-preview` comment on pull request to trigger a plan-preview manually
+
 
 ``` yaml
 on:
