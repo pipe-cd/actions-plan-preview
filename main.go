@@ -54,8 +54,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Successfully parsed GitHub event")
-	log.Println(event)
+	log.Printf("Successfully parsed GitHub event\n\tbase-branch %s\n\thead-branch %s\n\thead-commit %s\n", event.BaseBranch, event.HeadBranch, event.HeadCommit)
 
 	result, err := retrievePlanPreview(
 		ctx,
