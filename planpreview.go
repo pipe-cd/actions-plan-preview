@@ -32,6 +32,14 @@ type PlanPreviewResult struct {
 	FailurePipeds       []FailurePiped
 }
 
+func (r *PlanPreviewResult) HasError() bool {
+	return len(r.FailureApplications)+len(r.FailurePipeds) > 0
+}
+
+func (r *PlanPreviewResult) NoChange() bool {
+	return len(r.Applications)+len(r.FailureApplications)+len(r.FailurePipeds) == 0
+}
+
 type ApplicationResult struct {
 	ApplicationInfo
 	SyncStrategy string // QUICK_SYNC, PIPELINE
@@ -115,55 +123,78 @@ func retrievePlanPreview(
 	return &r, nil
 }
 
+const (
+	successBadgeURL = `<!-- pipecd-plan-preview-->
+	[![PLAN_PREVIEW](https://img.shields.io/static/v1?label=PipeCD&message=Plan_Preview&color=success&style=flat)](https://pipecd.dev/docs/user-guide/plan-preview/)
+	`
+	failureBadgeURL = `<!-- pipecd-plan-preview-->
+	[![PLAN_PREVIEW](https://img.shields.io/static/v1?label=PipeCD&message=Plan_Preview&color=orange&style=flat)](https://pipecd.dev/docs/user-guide/plan-preview/)
+	`
+
+	noChangeTitleFormat  = "Ran plan-preview against head commit %s of this pull request. PipeCD detected `0` updated application. It means no deployment will be triggered once this pull request got merged.\n"
+	hasChangeTitleFormat = "Ran plan-preview against head commit %s of this pull request. PipeCD detected `%d` updated applications and here are their plan results. Once this pull request got merged their deployments will be triggered to run as these estimations.\n"
+	detailsFormat        = "<details>\n<summary>Details (Click me)</summary>\n<p>\n\n``` %s\n%s\n```\n</p>\n</details>\n"
+)
+
 func makeCommentBody(event *githubEvent, r *PlanPreviewResult) string {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("@%s, ", event.SenderLogin))
 
-	if len(r.Applications)+len(r.FailureApplications)+len(r.FailurePipeds) == 0 {
-		fmt.Fprintf(&b, "This pull request does not touch any applications\n")
+	if !r.HasError() {
+		b.WriteString(successBadgeURL)
+	} else {
+		b.WriteString(failureBadgeURL)
+	}
+
+	if event.IsComment {
+		b.WriteString(fmt.Sprintf("@%s ", event.SenderLogin))
+	}
+
+	if r.NoChange() {
+		fmt.Fprintf(&b, noChangeTitleFormat, event.HeadCommit)
 		return b.String()
 	}
 
-	b.WriteString(fmt.Sprintf("Here are plan-preview result for commit %s:\n", event.HeadCommit))
+	b.WriteString(fmt.Sprintf(hasChangeTitleFormat, event.HeadCommit, len(r.Applications)))
 
-	if len(r.Applications) > 0 {
-		if len(r.Applications) > 1 {
-			fmt.Fprintf(&b, "\nHere are plan-preview for %d applications:\n", len(r.Applications))
-		} else {
-			fmt.Fprintf(&b, "\nHere are plan-preview for 1 application:\n")
+	for _, app := range r.Applications {
+		fmt.Fprintf(&b, "## app: [%s](%s), env: [%s](%s), kind: %s\n", app.ApplicationName, app.ApplicationURL, app.EnvName, app.EnvURL, strings.ToLower(app.ApplicationKind))
+		fmt.Fprintf(&b, "Sync strategy: %s\n", app.SyncStrategy)
+		fmt.Fprintf(&b, "Summary: %s\n\n", app.PlanSummary)
+
+		var lang string = "diff"
+		if app.ApplicationKind == "TERRAFORM" {
+			lang = "hcl"
 		}
-		for i, app := range r.Applications {
-			fmt.Fprintf(&b, "\n%d. app: %s, env: %s, kind: %s\n", i+1, app.ApplicationName, app.EnvName, app.ApplicationKind)
-			fmt.Fprintf(&b, "  sync strategy: %s\n", app.SyncStrategy)
-			fmt.Fprintf(&b, "  summary: %s\n", app.PlanSummary)
-			fmt.Fprintf(&b, "  details:\n\n  ---DETAILS_BEGIN---\n%s\n  ---DETAILS_END---\n", app.PlanDetails)
-		}
+		fmt.Fprintf(&b, detailsFormat, lang, app.PlanDetails)
 	}
 
+	if !r.HasError() {
+		return b.String()
+	}
+
+	fmt.Fprintf(&b, "\n---\n\n## NOTE\n\n")
+
 	if len(r.FailureApplications) > 0 {
-		if len(r.FailureApplications) > 1 {
-			fmt.Fprintf(&b, "\nNOTE: An error occurred while building plan-preview for the following %d applications:\n", len(r.FailureApplications))
-		} else {
-			fmt.Fprintf(&b, "\nNOTE: An error occurred while building plan-preview for the following application:\n")
-		}
-		for i, app := range r.FailureApplications {
-			fmt.Fprintf(&b, "\n%d. app: %s, env: %s, kind: %s\n", i+1, app.ApplicationName, app.EnvName, app.ApplicationKind)
-			fmt.Fprintf(&b, "  reason: %s\n", app.Reason)
-			if len(app.PlanDetails) > 0 {
-				fmt.Fprintf(&b, "  details:\n\n  ---DETAILS_BEGIN---\n%s\n  ---DETAILS_END---\n", app.PlanDetails)
+		fmt.Fprintf(&b, "**an error occurred while building plan-preview for the following applications**\n")
+
+		for _, app := range r.FailureApplications {
+			fmt.Fprintf(&b, "## app: [%s](%s), env: [%s](%s), kind: %s\n", app.ApplicationName, app.ApplicationURL, app.EnvName, app.EnvURL, strings.ToLower(app.ApplicationKind))
+			fmt.Fprintf(&b, "Reason: %s\n\n", app.Reason)
+
+			var lang string = "diff"
+			if app.ApplicationKind == "TERRAFORM" {
+				lang = "hcl"
 			}
+			fmt.Fprintf(&b, detailsFormat, lang, app.PlanDetails)
 		}
 	}
 
 	if len(r.FailurePipeds) > 0 {
-		if len(r.FailurePipeds) > 1 {
-			fmt.Fprintf(&b, "\nNOTE: An error occurred while building plan-preview for applications of the following %d Pipeds:\n", len(r.FailurePipeds))
-		} else {
-			fmt.Fprintf(&b, "\nNOTE: An error occurred while building plan-preview for applications of the following Piped:\n")
-		}
-		for i, piped := range r.FailurePipeds {
-			fmt.Fprintf(&b, "\n%d. piped: %s\n", i+1, piped.PipedID)
-			fmt.Fprintf(&b, "  reason: %s\n", piped.Reason)
+		fmt.Fprintf(&b, "**an error occurred while building plan-preview for applications of the following Pipeds**\n")
+
+		for _, piped := range r.FailurePipeds {
+			fmt.Fprintf(&b, "## piped: [%s](%s)\n", piped.PipedID, piped.PipedURL)
+			fmt.Fprintf(&b, "Reason: %s\n\n", piped.Reason)
 		}
 	}
 
