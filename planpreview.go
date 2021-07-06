@@ -125,11 +125,13 @@ func retrievePlanPreview(
 
 const (
 	successBadgeURL = `<!-- pipecd-plan-preview-->
-	[![PLAN_PREVIEW](https://img.shields.io/static/v1?label=PipeCD&message=Plan_Preview&color=success&style=flat)](https://pipecd.dev/docs/user-guide/plan-preview/)
-	`
+[![PLAN_PREVIEW](https://img.shields.io/static/v1?label=PipeCD&message=Plan_Preview&color=success&style=flat)](https://pipecd.dev/docs/user-guide/plan-preview/)
+
+`
 	failureBadgeURL = `<!-- pipecd-plan-preview-->
-	[![PLAN_PREVIEW](https://img.shields.io/static/v1?label=PipeCD&message=Plan_Preview&color=orange&style=flat)](https://pipecd.dev/docs/user-guide/plan-preview/)
-	`
+[![PLAN_PREVIEW](https://img.shields.io/static/v1?label=PipeCD&message=Plan_Preview&color=orange&style=flat)](https://pipecd.dev/docs/user-guide/plan-preview/)
+
+`
 
 	noChangeTitleFormat  = "Ran plan-preview against head commit %s of this pull request. PipeCD detected `0` updated application. It means no deployment will be triggered once this pull request got merged.\n"
 	hasChangeTitleFormat = "Ran plan-preview against head commit %s of this pull request. PipeCD detected `%d` updated applications and here are their plan results. Once this pull request got merged their deployments will be triggered to run as these estimations.\n"
@@ -157,7 +159,7 @@ func makeCommentBody(event *githubEvent, r *PlanPreviewResult) string {
 	b.WriteString(fmt.Sprintf(hasChangeTitleFormat, event.HeadCommit, len(r.Applications)))
 
 	for _, app := range r.Applications {
-		fmt.Fprintf(&b, "## app: [%s](%s), env: [%s](%s), kind: %s\n", app.ApplicationName, app.ApplicationURL, app.EnvName, app.EnvURL, strings.ToLower(app.ApplicationKind))
+		fmt.Fprintf(&b, "\n## app: [%s](%s), env: [%s](%s), kind: %s\n", app.ApplicationName, app.ApplicationURL, app.EnvName, app.EnvURL, strings.ToLower(app.ApplicationKind))
 		fmt.Fprintf(&b, "Sync strategy: %s\n", app.SyncStrategy)
 		fmt.Fprintf(&b, "Summary: %s\n\n", app.PlanSummary)
 
