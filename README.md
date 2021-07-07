@@ -1,10 +1,18 @@
 # actions-plan-preview
 
-An action that comments PipeCD's PlanPreview result on GitHub pull request.
+An action that comments PipeCD's PlanPreview result on GitHub pull request. This action can be used for all application kinds: Kubernetes, Terraform, CloudRun, Lambda, Amazon ECS.
 
 See https://pipecd.dev/docs/user-guide/plan-preview/ for more details about this feature.
 
-![](/assets/plan-preview-comment.png)
+## Screenshots
+
+- Plan-preview comment shows the diff of an Kubernetes application
+
+![](/assets/plan-preview-comment-kubernetes.png)
+
+- Plan-preview comment shows the diff of an Terraform application
+
+![](/assets/plan-preview-comment-terraform.png)
 
 ## Usage
 
