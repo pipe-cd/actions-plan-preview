@@ -60,3 +60,8 @@ jobs:
 | address                         | The address of PipeCD's control-plane.                                                            |    yes   |               |
 | api-key                         | The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane. |    yes   |               |
 | token                           | The GITHUB_TOKEN secret.                                                                          |    yes   |               |
+
+## Contributing
+
+Source code for this action is placing at [pipe-cd/pipe](https://github.com/pipe-cd/pipe/tree/master/dockers/actions-plan-preview) repository.
+Please send pull request to that repository to update.
