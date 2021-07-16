@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: pipe-cd/actions-plan-preview@v1.0.1
         with:
-          address: ${{ secrets.PIPECD_ADDRESS }}
+          address: ${{ secrets.PIPECD_API_ADDRESS }}
           api-key: ${{ secrets.PIPECD_PLAN_PREVIEW_API_KEY }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: pipe-cd/actions-plan-preview@v1.0.1
         with:
-          address: ${{ secrets.PIPECD_ADDRESS }}
+          address: ${{ secrets.PIPECD_API_ADDRESS }}
           api-key: ${{ secrets.PIPECD_PLAN_PREVIEW_API_KEY }}
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -57,7 +57,7 @@ jobs:
 
 | Name                            | Description                                                                                       | Required | Default Value |
 |---------------------------------|---------------------------------------------------------------------------------------------------|:--------:|:-------------:|
-| address                         | The address of PipeCD's control-plane.                                                            |    yes   |               |
+| address                         | The API address of PipeCD's control-plane.                                                        |    yes   |               |
 | api-key                         | The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane. |    yes   |               |
 | token                           | The GITHUB_TOKEN secret.                                                                          |    yes   |               |
 
