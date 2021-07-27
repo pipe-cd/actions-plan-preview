@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     if: "github.event_name == 'pull_request'"
     steps:
-      - uses: pipe-cd/actions-plan-preview@v1.1.2
+      - uses: pipe-cd/actions-plan-preview@v1.1.5
         with:
           address: ${{ secrets.PIPECD_API_ADDRESS }}
           api-key: ${{ secrets.PIPECD_PLAN_PREVIEW_API_KEY }}
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     if: "github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/pipecd plan-preview')"
     steps:
-      - uses: pipe-cd/actions-plan-preview@v1.1.2
+      - uses: pipe-cd/actions-plan-preview@v1.1.5
         with:
           address: ${{ secrets.PIPECD_API_ADDRESS }}
           api-key: ${{ secrets.PIPECD_PLAN_PREVIEW_API_KEY }}
