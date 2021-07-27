@@ -1,1 +1,1 @@
-FROM gcr.io/pipecd/actions-plan-preview:1.1.3
+FROM gcr.io/pipecd/actions-plan-preview:1.1.5
