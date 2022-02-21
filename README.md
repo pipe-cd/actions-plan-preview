@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     if: "github.event_name == 'pull_request'"
     steps:
-      - uses: pipe-cd/actions-plan-preview@v1.4.0
+      - uses: pipe-cd/actions-plan-preview@v1.5.0
         with:
           address: ${{ secrets.PIPECD_API_ADDRESS }}
           api-key: ${{ secrets.PIPECD_PLAN_PREVIEW_API_KEY }}
