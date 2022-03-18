@@ -23,6 +23,8 @@ By adding the following workflow to your `.github` directory (eg: `.github/workf
 
 
 ``` yaml
+name: PipeCD
+
 on:
   pull_request:
     branches:
@@ -33,6 +35,7 @@ on:
 
 jobs:
   plan-preview:
+    name: Plan Preview
     runs-on: ubuntu-latest
     if: "github.event_name == 'pull_request'"
     steps:
@@ -43,6 +46,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   plan-preview-on-comment:
+    name: Plan Preview
     runs-on: ubuntu-latest
     if: "github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, '/pipecd plan-preview')"
     steps:
