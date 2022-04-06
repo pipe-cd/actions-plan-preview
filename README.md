@@ -4,6 +4,8 @@ An action that comments PipeCD's PlanPreview result on GitHub pull request. This
 
 See https://pipecd.dev/docs/user-guide/plan-preview/ for more details about this feature.
 
+**NOTE**: The source code of this GitHub Action is placing under the tool directory of of [pipe-cd/pipecd](https://github.com/pipe-cd/pipecd/tree/master/tool) repository. If you want to make a pull request or raise an issue, please send it to [pipe-cd/pipecd](https://github.com/pipe-cd/pipecd) repository.
+
 ## Screenshots
 
 - Plan-preview comment shows the diff of an Kubernetes application
