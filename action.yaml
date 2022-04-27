@@ -16,6 +16,9 @@ inputs:
     description: 'Maximum amount of time to run. Default is 5m.'
     required: false
     default: 5m
+  pull-request-number:
+    description: 'PR Number needed for push event'
+    required: false
 
 runs:
   using: 'docker'
@@ -25,6 +28,7 @@ runs:
     - api-key=${{ inputs.api-key }}
     - token=${{ inputs.token }}
     - timeout=${{ inputs.timeout }}
+    - pull-request-number=${{ inputs.pull-request-number }}
 
 branding:
   icon: 'eye'
