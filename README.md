@@ -59,6 +59,36 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+### Push events
+
+To run actions-plan-preview after automatically creating PRs on push events using [GITHUB_TOKEN](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow), it goes as follows.
+
+```yaml
+name: PipeCD
+
+on:
+  push:
+    branches: pr-target-branch
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    if: "github.event.created"
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: create-pr
+        run: |
+          PR=$(gh pr create --title "Update" --body "" | awk -F "/" '{print $NF}')
+          echo "::set-output name=pull-request-number::$PR"
+      - uses: pipe-cd/actions-plan-preview@v1.8.0
+        with:
+          address: ${{ secrets.PIPECD_API_ADDRESS }}
+          api-key: ${{ secrets.PIPECD_PLAN_PREVIEW_API_KEY }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+```
+
 ## Inputs
 
 | Name                            | Description                                                                                       | Required | Default Value |
@@ -66,3 +96,4 @@ jobs:
 | address                         | The API address of PipeCD's control-plane.                                                        |    yes   |               |
 | api-key                         | The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane. |    yes   |               |
 | token                           | The GITHUB_TOKEN secret.                                                                          |    yes   |               |
+| pull-request-number             | PR Number needed for push event.                                                                  |   false  |               |
