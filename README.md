@@ -96,4 +96,4 @@ jobs:
 | address                         | The API address of PipeCD's control-plane.                                                        |    yes   |               |
 | api-key                         | The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane. |    yes   |               |
 | token                           | The GITHUB_TOKEN secret.                                                                          |    yes   |               |
-| pull-request-number             | PR Number needed for push event.                                                                  |   false  |               |
+| pull-request-number             | PR Number needed for push event.                                                                  |   no  |               |
