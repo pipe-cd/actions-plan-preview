@@ -1,2 +1,2 @@
-# https://github.com/pipe-cd/pipecd/pkgs/container/actions-plan-preview/61747856?tag=v0.41.0-8-g479336d
-FROM ghcr.io/pipe-cd/actions-plan-preview@sha256:50b04e7e008039df7eecaeccb4b332b18c335fee3b22c11bcaf5f1ca9ae0ced9
+# https://github.com/pipe-cd/pipecd/pkgs/container/actions-plan-preview/63279202?tag=v0.41.3
+FROM ghcr.io/pipe-cd/actions-plan-preview@sha256:0f4d2b96551616c95718b930e37e4c973b497a64974dd52af1a5367614127857
