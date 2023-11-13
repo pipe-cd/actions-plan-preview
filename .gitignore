@@ -14,4 +14,8 @@
 # Dependency directories (remove the comment below to include it)
 vendor/
 
+# IntelliJ idea
+.idea
+actions-plan-preview.iml
+
 plan-preview
