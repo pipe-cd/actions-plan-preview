@@ -16,6 +16,10 @@ inputs:
     description: 'Maximum amount of time to run. Default is 5m.'
     required: false
     default: 5m
+  piped-handle-timeout:
+    description: 'Maximum amount of time to wait for piped handle the plan preview. Default is 5m.'
+    required: false
+    default: 5m
 
 runs:
   using: 'docker'
@@ -25,6 +29,7 @@ runs:
     - api-key=${{ inputs.api-key }}
     - token=${{ inputs.token }}
     - timeout=${{ inputs.timeout }}
+    - piped-handle-timeout=${{ inputs.piped-handle-timeout }}
 
 branding:
   icon: 'eye'
