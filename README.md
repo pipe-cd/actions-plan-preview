@@ -66,3 +66,6 @@ jobs:
 | address                         | The API address of PipeCD's control-plane.                                                        |    yes   |               |
 | api-key                         | The API key with READ_WRITE role used by pipectl while communicating with PipeCD's control-plane. |    yes   |               |
 | token                           | The GITHUB_TOKEN secret.                                                                          |    yes   |               |
+| timeout                         | Maximum amount of time to run.                                                                    |    no    | 5m            |
+| piped-handle-timeout            | Maximum amount of time to wait for piped handle the plan preview.                                 |    no    | 5m            |
+| sort-label-keys                 | The application label keys to sort the results by.                                                |    no    | ""            |
