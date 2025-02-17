@@ -20,6 +20,10 @@ inputs:
     description: 'Maximum amount of time to wait for piped handle the plan preview. Default is 5m.'
     required: false
     default: 5m
+  sort-label-keys:
+    description: 'The application label keys to sort the results by. If not specified, the results will be sorted by only PipedID and ApplicationName.'
+    required: false
+    default: ''
 
 runs:
   using: 'docker'
@@ -30,6 +34,7 @@ runs:
     - token=${{ inputs.token }}
     - timeout=${{ inputs.timeout }}
     - piped-handle-timeout=${{ inputs.piped-handle-timeout }}
+    - sort-label-keys=${{ inputs.sort-label-keys }}
 
 branding:
   icon: 'eye'
