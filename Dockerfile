@@ -1,2 +1,12 @@
-# https://github.com/pipe-cd/pipecd/pkgs/container/actions-plan-preview/524650855?tag=v0.54.2
-FROM ghcr.io/pipe-cd/actions-plan-preview@sha256:1eb182e26afaca1ab8b297ee23c2afdcc154e2d162cf6c8aecb5b256e138b5f3
+FROM golang:1.25.0-alpine3.22 AS builder
+WORKDIR /app
+COPY go.mod go.sum  ./
+RUN go mod download
+COPY . ./
+RUN go build -o /plan-preview .
+
+FROM ghcr.io/pipe-cd/pipectl:v0.53.0
+COPY --from=builder /plan-preview /
+ENV PATH=$PATH:/app/cmd/pipectl
+RUN chmod +x /plan-preview
+ENTRYPOINT ["/plan-preview"]
